@@ -1,5 +1,4 @@
 package rph.controller;
-<<<<<<< HEAD
 import rph.entity.User;
 import rph.security.CustomUserDetails;
 
@@ -10,11 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
 
-=======
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
->>>>>>> Dev
 import rph.dto.*;
 import rph.service.UserService;
 
@@ -31,10 +25,15 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        return userService.login(request);
+public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    LoginResponse response = userService.login(request);
+
+    if (response.isSuccess()) {
+        return ResponseEntity.ok(response);  // HTTP 200 OK
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);  // HTTP 401 Unauthorized
     }
-<<<<<<< HEAD
+    }
 
     @GetMapping("/me")
     public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal rph.security.CustomUserDetails userDetails) {
@@ -47,6 +46,4 @@ public class UserController {
     return ResponseEntity.ok("로그아웃 성공 (클라이언트에서 토큰 삭제하세요)"); //클라에서 토큰을 삭제 해야함, jwt 자체 삭제해서 헤더에 인증안오게
     }
 
-=======
->>>>>>> Dev
 }

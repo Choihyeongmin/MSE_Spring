@@ -1,32 +1,3 @@
-<<<<<<< HEAD
-# Java class files
-*.class
-
-# Maven build directory
-target/
-
-# VS Code settings
-.vscode/
-
-# Logs
-*.log
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Backup files
-*.swp
-*.bak
-*.tmp
-*~
-
-# IDE metadata
-*.iml
-.project
-.classpath
-.idea/
-=======
 # Java
 *.class
 *.jar
@@ -81,4 +52,3 @@ spring.log
 node_modules/
 *.db
 
->>>>>>> Dev
