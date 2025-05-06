@@ -20,12 +20,18 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public SignupResponse signup(@RequestBody SignupRequest request) {
-        return userService.signup(request);
+    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
+        SignupResponse response = userService.signup(request);
+    
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response); // HTTP 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // HTTP 409 Conflict
+        }
     }
 
     @PostMapping("/login")
-public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
     LoginResponse response = userService.login(request);
 
     if (response.isSuccess()) {
