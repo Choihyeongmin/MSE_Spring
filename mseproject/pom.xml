@@ -41,6 +41,19 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- jwt 라이브러리리-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- H2 DB (테스트용, 메모리 DB) -->
         <dependency>
             <groupId>com.h2database</groupId>
