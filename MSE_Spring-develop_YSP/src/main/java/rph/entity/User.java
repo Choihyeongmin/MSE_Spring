@@ -32,7 +32,7 @@ public class User {
     private int exp = 0;
     private int level = 1;
     private int coins = 0;
-    
+
     public void addExpAndCoins(int expGain, int coinGain) {
         this.exp += expGain;
         this.coins += coinGain;
@@ -42,5 +42,4 @@ public class User {
             this.level += 1;
         }
     }
-
 }
