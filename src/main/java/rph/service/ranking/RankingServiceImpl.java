@@ -38,6 +38,7 @@ public class RankingServiceImpl implements RankingService {
     public void updateRanking(User player1, User player2, User winner, boolean draw) {
         updateSingle(player1, winner, draw);
         updateSingle(player2, winner, draw);
+        recalculateAllRanks();
     }
 
     private void updateSingle(User user, User winner, boolean draw) {
@@ -63,5 +64,16 @@ public class RankingServiceImpl implements RankingService {
 
         ranking.setLastUpdated(LocalDateTime.now());
         rankingRepository.save(ranking);
+    }
+
+    private void recalculateAllRanks() {
+        // totalPoints 기준 내림차순으로 가져오기
+        List<Ranking> all = rankingRepository.findAllByOrderByTotalPointsDesc();
+
+        // 1위부터 순위 할당
+        for (int i = 0; i < all.size(); i++) {
+            all.get(i).setRank_(i + 1);
+        }
+        rankingRepository.saveAll(all);
     }
 }

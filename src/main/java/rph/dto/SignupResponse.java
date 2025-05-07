@@ -1,12 +1,11 @@
 package rph.dto;
 
-public class SignupResponse {
-    public boolean success;
-    public String message;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public SignupResponse(boolean success, String message) {
-        this.success = success;
-        this.message = message;
-    }
-    public SignupResponse(){}
+@Getter
+@AllArgsConstructor
+public class SignupResponse {
+    private boolean success;
+    private String message;
 }
