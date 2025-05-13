@@ -30,6 +30,18 @@ public class UserController {
         }
     }
 
+    
+ @GetMapping("/signup/{username}")
+    public ResponseEntity<?> checkUsername(@PathVariable String username) {
+    boolean isAvailable = userService.isUsernameAvailable(username);
+
+    if (isAvailable) {
+            return ResponseEntity.ok("사용 가능한 아이디입니다.");
+        }    else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다.");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
     LoginResponse response = userService.login(request);
