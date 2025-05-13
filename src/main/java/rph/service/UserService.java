@@ -44,4 +44,9 @@ public class UserService {
     
         return new LoginResponse(true, "로그인 성공!", token);
     }
+
+    public boolean isUsernameAvailable(String username) {
+    return !userRepository.existsByUsername(username);
+    }
+    
 }
