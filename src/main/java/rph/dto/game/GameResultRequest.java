@@ -1,5 +1,7 @@
 package rph.dto.game;
 
+import javax.validation.constraints.Max;
+
 import lombok.*;
 
 @Getter
@@ -13,5 +15,7 @@ public class GameResultRequest {
     private boolean draw;          // true이면 무승부
     private int tileOwnedPlayer1;
     private int tileOwnedPlayer2;
+
+    @Max(100)
     private int scoreDiff;
 }

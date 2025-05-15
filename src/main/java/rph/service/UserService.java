@@ -17,9 +17,6 @@ public class UserService {
     private JwtTokenProvider jwtTokenProvider;
 
     public SignupResponse signup(SignupRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            return new SignupResponse(false, "이미 존재하는 ID입니다.");
-        }
 
         User user = new User();
         user.setUsername(request.getUsername());
