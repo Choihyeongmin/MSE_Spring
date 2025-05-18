@@ -13,7 +13,6 @@ import java.util.List;
 @RequestMapping("/user-items")
 @RequiredArgsConstructor
 public class UserItemController {
-
     private final UserItemService userItemService;
 
     @PostMapping
