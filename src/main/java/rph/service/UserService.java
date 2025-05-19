@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import rph.exception.ErrorCode.UserErrorCode;
 import rph.exception.UserException;
 import rph.dto.*;
+import rph.entity.RefreshToken;
 import rph.entity.User;
 import rph.jwt.JwtTokenProvider;
+import rph.repository.RefreshTokenRepository;
 import rph.repository.UserRepository;
 import rph.util.PasswordUtil;
 
@@ -19,6 +21,9 @@ public class UserService {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private final RefreshTokenRepository refreshTokenRepository;
+
 
     public SignupResponse signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -54,8 +59,12 @@ public class UserService {
         throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
-        String token = jwtTokenProvider.generateToken(user.getUsername());
-        return new LoginResponse(true, "로그인 성공!", token);
+        String token = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+
+        refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken)); // 리프레시 토큰 저장
+
+    return new LoginResponse(true, "로그인 성공!", token);
     }
 
     public boolean isUsernameAvailable(String username) {
