@@ -43,12 +43,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void saveItem(ItemRequest request){
+    public ItemResponse saveItem(ItemRequest request){
         Item item = new Item();
         item.setName(request.getName());
         item.setPrice(request.getPrice());
         item.setDescription(request.getDescription());
         item.setType(ItemType.valueOf(request.getType().toUpperCase()));
-        itemRepository.save(item);
+        return ItemResponse.from(itemRepository.save(item));
     }
 }

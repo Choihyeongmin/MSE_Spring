@@ -8,5 +8,5 @@ public interface ItemService {
     List<ItemResponse> getAllItems();
     ItemResponse getItemById(Long itemId);
     List<ItemResponse> getItemsByType(String type);
-    void saveItem(ItemRequest item);
+    ItemResponse saveItem(ItemRequest item);
 }

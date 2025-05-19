@@ -1,11 +1,13 @@
 package rph.exception;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.validation.FieldError;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,13 @@ public class ErrorResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final List<ValidationError> errors;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Map<String, Object> data; // 추가 정보 (선택적)
+
     @Getter
     @Builder
     @RequiredArgsConstructor
     public static class ValidationError {
-    
         private final String field;
         private final String message;
 
@@ -38,3 +42,4 @@ public class ErrorResponse {
         }
     }
 }
+

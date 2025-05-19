@@ -10,6 +10,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
 
 import rph.dto.*;
+import rph.dto.user.GoogleLoginRequest;
+import rph.dto.user.GoogleSignupRequest;
+import rph.dto.user.LoginRequest;
+import rph.dto.user.LoginResponse;
+import rph.dto.user.SignupRequest;
+import rph.dto.user.SignupResponse;
 import rph.service.UserService;
 
 @RestController
@@ -52,4 +58,17 @@ public class UserController {
     return ResponseEntity.ok("로그아웃 성공 (클라이언트에서 토큰 삭제하세요)"); //클라에서 토큰을 삭제 해야함, jwt 자체 삭제해서 헤더에 인증안오게
     }
 
+    @PostMapping("/google/login")
+    public ResponseEntity<LoginResponse> googleLogin(@RequestBody GoogleLoginRequest request) {
+                System.out.println("googleloginCont");
+
+        LoginResponse response = userService.googleLogin(request);
+        return ResponseEntity.ok(response);  // HTTP 200 OK 
+    }
+
+    @PostMapping("/google/signup")
+    public ResponseEntity<LoginResponse> googleLogin(@RequestBody GoogleSignupRequest request) {
+        LoginResponse response = userService.googleSignup(request);
+        return ResponseEntity.ok(response);  // HTTP 200 OK
+    }
 }

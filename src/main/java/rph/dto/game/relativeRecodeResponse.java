@@ -6,7 +6,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class relativeRecode {
+public class relativeRecodeResponse {
     private int totalGames;
     private int user1Wins;
     private int user2Wins;

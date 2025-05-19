@@ -1,6 +1,8 @@
 package rph.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rph.dto.useritem.UserItemRequest;
@@ -18,7 +20,7 @@ public class UserItemController {
 
     @PostMapping
     public ResponseEntity<UserItemResponse> purchaseItem(@RequestBody UserItemRequest request) {
-        return ResponseEntity.ok(userItemService.purchaseItem(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userItemService.purchaseItem(request));
     }
 
     @GetMapping("/{userId}")

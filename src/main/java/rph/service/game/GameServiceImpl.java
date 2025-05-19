@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rph.dto.game.GameResultRequest;
 import rph.dto.game.GameResultResponse;
-import rph.dto.game.relativeRecode;
+import rph.dto.game.relativeRecodeResponse;
 import rph.entity.GameResult;
 import rph.exception.CommonErrorCode;
 import rph.exception.RestApiException;
@@ -26,7 +26,7 @@ public class GameServiceImpl implements GameService {
     private final RankingService rankingService;
 
     @Override
-    public void saveGameResult(GameResultRequest request) {
+    public GameResultResponse saveGameResult(GameResultRequest request) {
         User player1 = userRepository.findById(request.getPlayer1Id())
                 .orElseThrow(() -> new IllegalArgumentException("player1 not found"));
         User player2 = userRepository.findById(request.getPlayer2Id())
@@ -46,9 +46,10 @@ public class GameServiceImpl implements GameService {
         gameResult.setStartTime(LocalDateTime.now());
         gameResult.setEndTime(LocalDateTime.now());
 
-        gameResultRepository.save(gameResult);
+        GameResultResponse response = GameResultResponse.from(gameResultRepository.save(gameResult));
         rankingService.updateRanking(player1, player2, winner, request.isDraw());
         rewardPlayers(player1, player2, winner, request.isDraw());
+        return response;
     }
     
     @Override
@@ -63,7 +64,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public relativeRecode findRelativeRecode(Long user1, Long user2){
+    public relativeRecodeResponse findRelativeRecode(Long user1, Long user2){
         List<GameResult> gameResults1 = gameResultRepository.findByPlayer1_IdAndPlayer2_Id(user1, user2);
         List<GameResult> gameResults2 = gameResultRepository.findByPlayer1_IdAndPlayer2_Id(user2, user1);
 
@@ -91,7 +92,7 @@ public class GameServiceImpl implements GameService {
             }
             totalGames++;
         }
-        return (new relativeRecode(totalGames, user1Win, user2Win, draw));
+        return (new relativeRecodeResponse(totalGames, user1Win, user2Win, draw));
     }
 
     private void rewardPlayers(User player1, User player2, User winner, boolean draw) {

@@ -4,11 +4,11 @@ import java.util.List;
 
 import rph.dto.game.GameResultRequest;
 import rph.dto.game.GameResultResponse;
-import rph.dto.game.relativeRecode;
+import rph.dto.game.relativeRecodeResponse;
 
 
 public interface GameService {
-    void saveGameResult(GameResultRequest request);
+    GameResultResponse saveGameResult(GameResultRequest request);
     List<GameResultResponse> findByPlayerId(Long playerId);
-    relativeRecode findRelativeRecode(Long user1, Long user2);
+    relativeRecodeResponse findRelativeRecode(Long user1, Long user2);
 }
