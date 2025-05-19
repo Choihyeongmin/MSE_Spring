@@ -11,7 +11,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = "secret1234"; // 👉 꼭 환경변수나 외부로 뺄 것!
+    private final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");//.env
+
     private final long EXPIRATION = 1000L * 60 * 60; // 1시간
 
     public String generateToken(String username) {

@@ -3,12 +3,13 @@ package rph.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import main.java.rph.exception.UserErrorCode;
-import main.java.rph.exception.UserException;
+import rph.exception.ErrorCode.UserErrorCode;
+import rph.exception.UserException;
 import rph.dto.*;
 import rph.entity.User;
 import rph.jwt.JwtTokenProvider;
 import rph.repository.UserRepository;
+import rph.util.PasswordUtil;
 
 @Service
 public class UserService {
@@ -24,10 +25,14 @@ public class UserService {
         throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
 
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
+
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
         user.setNickname(request.getNickname());
+        user.setSalt(salt);  // 저장
+        user.setPassword(hashedPassword);  // 해시 저장
         user.setExp(0);
         user.setLevel(1);
         user.setCoins(0);
@@ -43,7 +48,9 @@ public class UserService {
         throw new UserException(UserErrorCode.USER_NOT_FOUND);
         }
 
-            if (!user.getPassword().equals(request.getPassword())) {
+        String hashedInput = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
+        
+        if (!hashedInput.equals(user.getPassword())) {
         throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
