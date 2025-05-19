@@ -2,10 +2,16 @@ package rph.controller;
 import rph.entity.User;
 import rph.security.CustomUserDetails;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import rph.exception.ErrorCode.UserErrorCode;
+import rph.exception.UserException;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
 
@@ -19,44 +25,43 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
-        SignupResponse response = userService.signup(request);
-    
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response); // HTTP 200 OK
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // HTTP 409 Conflict
-        }
+   @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody @Valid SignupRequest request) {
+    userService.signup(request);  // 예외 발생 시 GlobalExceptionHandler가 처리
+    return ResponseEntity.ok("회원가입 성공!");
     }
 
-    
- @GetMapping("/signup/{username}")
-    public ResponseEntity<?> checkUsername(@PathVariable String username) {
-    boolean isAvailable = userService.isUsernameAvailable(username);
 
-    if (isAvailable) {
-            return ResponseEntity.ok("사용 가능한 아이디입니다.");
-        }    else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다.");
-        }
+    
+    @GetMapping("/signup/{username}")
+    public ResponseEntity<String> checkUsername(@PathVariable String username) {
+    if (!userService.isUsernameAvailable(username)) {
+        throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
     }
+    return ResponseEntity.ok("사용 가능한 아이디입니다.");
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-    LoginResponse response = userService.login(request);
+    LoginResponse response = userService.login(request);  // 실패 시 내부에서 예외 발생
+    return ResponseEntity.ok(response);  // 성공만 처리
+    }
 
-    if (response.isSuccess()) {
-        return ResponseEntity.ok(response);  // HTTP 200 OK
-    } else {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);  // HTTP 401 Unauthorized
-    }
-    }
+
+    public record UserInfoResponse(String username, String nickname, int exp, int level, int coins) {}
 
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal rph.security.CustomUserDetails userDetails) {
+    public ResponseEntity<UserInfoResponse> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
     User user = userDetails.getUser();
-    return new ResponseEntity<>(user, HttpStatus.OK);
+    UserInfoResponse response = new UserInfoResponse(
+        user.getUsername(),
+        user.getNickname(),
+        user.getExp(),
+        user.getLevel(),
+        user.getCoins()
+    );
+    return ResponseEntity.ok(response);
     }   
 
     @PostMapping("/logout")

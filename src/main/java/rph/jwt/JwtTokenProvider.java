@@ -1,6 +1,9 @@
 package rph.jwt;
 
 import io.jsonwebtoken.*;
+import rph.exception.TokenException;
+import rph.exception.ErrorCode.TokenErrorCode;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,20 +23,37 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        public String getUsernameFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new TokenException(TokenErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new TokenException(TokenErrorCode.TOKEN_INVALID);
+        }
     }
 
-    public boolean validateToken(String token) {
+        public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+        public boolean validateTokenOrThrow(String token) { // 나중에 확실한 expection 메세지를 주는 api가 만들어지면 쓰자.
+        try {
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            return true; 
+        } catch (ExpiredJwtException e) {
+            throw new TokenException(TokenErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new TokenException(TokenErrorCode.TOKEN_INVALID);
         }
     }
 }

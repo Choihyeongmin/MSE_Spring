@@ -2,6 +2,9 @@ package rph.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import main.java.rph.exception.UserErrorCode;
+import main.java.rph.exception.UserException;
 import rph.dto.*;
 import rph.entity.User;
 import rph.jwt.JwtTokenProvider;
@@ -18,7 +21,7 @@ public class UserService {
 
     public SignupResponse signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            return new SignupResponse(false, "이미 존재하는 ID입니다.");
+        throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
 
         User user = new User();
@@ -36,12 +39,15 @@ public class UserService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername());
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            return new LoginResponse(false, "아이디 또는 비밀번호 오류",null);
+            if (user == null) {
+        throw new UserException(UserErrorCode.USER_NOT_FOUND);
         }
-    
+
+            if (!user.getPassword().equals(request.getPassword())) {
+        throw new UserException(UserErrorCode.INVALID_PASSWORD);
+        }
+
         String token = jwtTokenProvider.generateToken(user.getUsername());
-    
         return new LoginResponse(true, "로그인 성공!", token);
     }
 

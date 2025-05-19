@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserItemController {
     private final UserItemService userItemService;
-
     @PostMapping
     public ResponseEntity<UserItemResponse> purchaseItem(@RequestBody UserItemRequest request) {
         return ResponseEntity.ok(userItemService.purchaseItem(request));
