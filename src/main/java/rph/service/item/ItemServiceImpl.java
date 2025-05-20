@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rph.dto.item.ItemResponse;
 import rph.entity.Item.ItemType;
-import rph.exception.CommonErrorCode;
+import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.RestApiException;
 import rph.repository.ItemRepository;
 

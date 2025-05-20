@@ -22,7 +22,7 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
-    private final RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenRepository refreshTokenRepository;
 
 
     public SignupResponse signup(SignupRequest request) {
@@ -59,12 +59,12 @@ public class UserService {
         throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
-        String token = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
 
         refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken)); // 리프레시 토큰 저장
 
-    return new LoginResponse(true, "로그인 성공!", token);
+    return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
     }
 
     public boolean isUsernameAvailable(String username) {

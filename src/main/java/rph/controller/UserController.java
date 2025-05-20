@@ -1,4 +1,5 @@
 package rph.controller;
+import rph.entity.RefreshToken;
 import rph.entity.User;
 import rph.security.CustomUserDetails;
 
@@ -9,7 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import rph.exception.ErrorCode.TokenErrorCode;
 import rph.exception.ErrorCode.UserErrorCode;
+import rph.jwt.JwtTokenProvider;
+import rph.exception.TokenException;
 import rph.exception.UserException;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,9 +47,30 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
     LoginResponse response = userService.login(request);  // 실패 시 내부에서 예외 발생
     return ResponseEntity.ok(response);  // 성공만 처리
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody TokenRefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        if (!JwtTokenProvider.validateToken(refreshToken)) {
+            throw new TokenException(TokenErrorCode.TOKEN_INVALID);
+        }
+
+        String username = JwtTokenProvider.getUsernameFromToken(refreshToken);
+
+        RefreshToken stored = RefreshTokenRepository.findById(username)
+            .orElseThrow(() -> new TokenException(TokenErrorCode.TOKEN_NOT_FOUND));
+
+        if (!stored.getRefreshToken().equals(refreshToken)) {
+            throw new TokenException(TokenErrorCode.TOKEN_MISMATCH);
+        
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(username);
+        return ResponseEntity.ok(new TokenRefreshResponse(newAccessToken));
     }
 
 

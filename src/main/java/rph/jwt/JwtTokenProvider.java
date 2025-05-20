@@ -11,18 +11,27 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");//.env
+    private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");//.env
 
-    private final long EXPIRATION = 1000L * 60 * 60; // 1시간
+    private final long EXPIRATION = 1000L * 60 * 30; // 30분
+    private final long R_EXPRIRATION = 1000L *60 *60 *24 *7; //7일
 
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
+    public String generateAccessToken(String username) {
+    return Jwts.builder()
+            .setSubject(username)
+            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION)) // 30분
+            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .compact();
     }
+
+    public String generateRefreshToken(String username) {
+    return Jwts.builder()
+            .setSubject(username)
+            .setExpiration(new Date(System.currentTimeMillis() + R_EXPRIRATION)) // 7일
+            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .compact();
+    }
+
 
         public String getUsernameFromToken(String token) {
         try {
