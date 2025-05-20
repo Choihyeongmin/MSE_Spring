@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import rph.exception.ErrorCode.TokenErrorCode;
 import rph.exception.ErrorCode.UserErrorCode;
 import rph.jwt.JwtTokenProvider;
+import rph.repository.RefreshTokenRepository;
 import rph.exception.TokenException;
 import rph.exception.UserException;
 
@@ -25,6 +26,12 @@ import rph.service.UserService;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
     private UserService userService;
@@ -56,18 +63,18 @@ public class UserController {
     public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody TokenRefreshRequest request) {
         String refreshToken = request.getRefreshToken();
 
-        if (!JwtTokenProvider.validateToken(refreshToken)) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new TokenException(TokenErrorCode.TOKEN_INVALID);
         }
 
-        String username = JwtTokenProvider.getUsernameFromToken(refreshToken);
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
 
-        RefreshToken stored = RefreshTokenRepository.findById(username)
+        RefreshToken stored = refreshTokenRepository.findById(username)
             .orElseThrow(() -> new TokenException(TokenErrorCode.TOKEN_NOT_FOUND));
 
         if (!stored.getRefreshToken().equals(refreshToken)) {
             throw new TokenException(TokenErrorCode.TOKEN_MISMATCH);
-        
+        }
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(username);
         return ResponseEntity.ok(new TokenRefreshResponse(newAccessToken));
