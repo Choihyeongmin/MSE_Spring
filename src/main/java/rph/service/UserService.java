@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
+
+import rph.exception.ErrorCode.UserErrorCode;
+import rph.exception.UserException;
 import rph.dto.*;
 import rph.dto.user.GoogleLoginFalseResponse;
 import rph.dto.user.GoogleLoginRequest;
@@ -18,12 +20,10 @@ import rph.dto.user.LoginRequest;
 import rph.dto.user.LoginResponse;
 import rph.dto.user.SignupRequest;
 import rph.dto.user.SignupResponse;
-=======
 import rph.exception.ErrorCode.UserErrorCode;
 import rph.exception.UserException;
 import rph.dto.*;
 import rph.entity.RefreshToken;
->>>>>>> develop_YSP
 import rph.entity.User;
 import rph.exception.CommonErrorCode;
 import rph.exception.ErrorResponse;
@@ -51,12 +51,9 @@ public class UserService {
 
 
     public SignupResponse signup(SignupRequest request) {
-<<<<<<< HEAD
-=======
         if (userRepository.existsByUsername(request.getUsername())) {
         throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
->>>>>>> develop_YSP
 
         String salt = PasswordUtil.generateSalt();
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
@@ -94,7 +91,11 @@ public class UserService {
 
     return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
     }
-<<<<<<< HEAD
+
+    public boolean isUsernameAvailable(String username) {
+    return !userRepository.existsByUsername(username);
+    }
+    
     public LoginResponse googleLogin(GoogleLoginRequest request) {
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
         
@@ -130,12 +131,8 @@ public class UserService {
         String token = jwtTokenProvider.generateToken(user.getUsername());
         return new LoginResponse(true, "로그인 성공!", token);
     }
-
-=======
-
-    public boolean isUsernameAvailable(String username) {
+     public boolean isUsernameAvailable(String username) {
     return !userRepository.existsByUsername(username);
     }
-    
->>>>>>> develop_YSP
+
 }
