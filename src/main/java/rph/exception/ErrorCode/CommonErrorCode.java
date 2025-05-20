@@ -1,4 +1,4 @@
-package rph.exception;
+package rph.exception.ErrorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -17,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    // ✅ 이 메서드는 Spring Security가 자동으로 호출함
+    //  이 메서드는 Spring Security가 자동으로 호출함
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // DB에서 username으로 유저 조회

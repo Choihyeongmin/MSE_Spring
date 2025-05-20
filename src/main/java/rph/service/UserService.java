@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import rph.dto.*;
@@ -17,13 +18,21 @@ import rph.dto.user.LoginRequest;
 import rph.dto.user.LoginResponse;
 import rph.dto.user.SignupRequest;
 import rph.dto.user.SignupResponse;
+=======
+import rph.exception.ErrorCode.UserErrorCode;
+import rph.exception.UserException;
+import rph.dto.*;
+import rph.entity.RefreshToken;
+>>>>>>> develop_YSP
 import rph.entity.User;
 import rph.exception.CommonErrorCode;
 import rph.exception.ErrorResponse;
 import rph.exception.RestApiException;
 import rph.external.GoogleTokenVerifier;
 import rph.jwt.JwtTokenProvider;
+import rph.repository.RefreshTokenRepository;
 import rph.repository.UserRepository;
+import rph.util.PasswordUtil;
 
 @Service
 public class UserService {
@@ -37,13 +46,26 @@ public class UserService {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
 
     public SignupResponse signup(SignupRequest request) {
+<<<<<<< HEAD
+=======
+        if (userRepository.existsByUsername(request.getUsername())) {
+        throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
+        }
+>>>>>>> develop_YSP
+
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
         user.setNickname(request.getNickname());
+        user.setSalt(salt);  // 저장
+        user.setPassword(hashedPassword);  // 해시 저장
         user.setExp(0);
         user.setLevel(1);
         user.setCoins(0);
@@ -55,14 +77,24 @@ public class UserService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername());
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            return new LoginResponse(false, "아이디 또는 비밀번호 오류",null);
+            if (user == null) {
+        throw new UserException(UserErrorCode.USER_NOT_FOUND);
         }
-    
-        String token = jwtTokenProvider.generateToken(user.getUsername());
-    
-        return new LoginResponse(true, "로그인 성공!", token);
+
+        String hashedInput = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
+        
+        if (!hashedInput.equals(user.getPassword())) {
+        throw new UserException(UserErrorCode.INVALID_PASSWORD);
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+
+        refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken)); // 리프레시 토큰 저장
+
+    return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
     }
+<<<<<<< HEAD
     public LoginResponse googleLogin(GoogleLoginRequest request) {
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
         
@@ -99,4 +131,11 @@ public class UserService {
         return new LoginResponse(true, "로그인 성공!", token);
     }
 
+=======
+
+    public boolean isUsernameAvailable(String username) {
+    return !userRepository.existsByUsername(username);
+    }
+    
+>>>>>>> develop_YSP
 }

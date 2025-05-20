@@ -15,9 +15,7 @@ import java.util.List;
 @RequestMapping("/user-items")
 @RequiredArgsConstructor
 public class UserItemController {
-
     private final UserItemService userItemService;
-
     @PostMapping
     public ResponseEntity<UserItemResponse> purchaseItem(@RequestBody UserItemRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userItemService.purchaseItem(request));

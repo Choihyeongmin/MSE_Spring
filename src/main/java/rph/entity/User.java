@@ -21,6 +21,10 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    //salt
+    @Column(nullable = false)
+    private String salt;
+
     // 로그인용 비밀번호
     @Column(nullable = true)
     private String password;

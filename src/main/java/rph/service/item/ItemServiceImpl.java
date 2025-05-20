@@ -7,7 +7,7 @@ import rph.dto.item.ItemRequest;
 import rph.dto.item.ItemResponse;
 import rph.entity.Item;
 import rph.entity.Item.ItemType;
-import rph.exception.CommonErrorCode;
+import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.RestApiException;
 import rph.repository.ItemRepository;
 

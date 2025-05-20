@@ -1,4 +1,4 @@
-package rph.exception;
+package rph.exception.ErrorCode;
 
 import org.springframework.http.HttpStatus;
 
