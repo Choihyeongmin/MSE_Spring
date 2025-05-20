@@ -11,7 +11,9 @@ public enum CommonErrorCode implements ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "Invalid parameter included"),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not exists"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
-    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "item not exists");
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "item not exists"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not exists"),
+    NEED_SIGNUP_GOOGLE(HttpStatus.CONFLICT, "User not registered. Signup required");
 
     private final HttpStatus httpStatus;
     private final String message;

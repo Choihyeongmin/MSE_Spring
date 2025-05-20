@@ -1,4 +1,4 @@
-package rph.dto;
+package rph.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

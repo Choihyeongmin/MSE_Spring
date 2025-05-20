@@ -2,7 +2,10 @@ package rph.service.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import rph.dto.item.ItemRequest;
 import rph.dto.item.ItemResponse;
+import rph.entity.Item;
 import rph.entity.Item.ItemType;
 import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.RestApiException;
@@ -37,5 +40,15 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByType(itemType).stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ItemResponse saveItem(ItemRequest request){
+        Item item = new Item();
+        item.setName(request.getName());
+        item.setPrice(request.getPrice());
+        item.setDescription(request.getDescription());
+        item.setType(ItemType.valueOf(request.getType().toUpperCase()));
+        return ItemResponse.from(itemRepository.save(item));
     }
 }

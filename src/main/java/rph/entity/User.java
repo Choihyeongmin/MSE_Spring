@@ -17,7 +17,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 로그인용 아이디 (중복 불가)
+    // 로그인용 아이디 (중복 불가, 구글 로그인시 email이 아이디)
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -26,12 +26,16 @@ public class User {
     private String salt;
 
     // 로그인용 비밀번호
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     // 닉네임 (표시용 이름)
     @Column(unique = true, nullable = false)
     private String nickname;
+
+    //구글 로그인용
+    @Column(unique = true)
+    private String googleId;
 
     private int exp = 0;
     private int level = 1;
