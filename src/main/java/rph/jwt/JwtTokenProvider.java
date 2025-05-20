@@ -13,7 +13,7 @@ public class JwtTokenProvider {
 
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");//.env
 
-    private final long EXPIRATION = 1000L * 60 * 30; // 30분
+    private final long EXPIRATION = 1000L * 60 * 120; // 2시간
     private final long R_EXPRIRATION = 1000L *60 *60 *24 *7; //7일
 
     public String generateAccessToken(String username) {
