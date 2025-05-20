@@ -25,7 +25,7 @@ import rph.exception.UserException;
 import rph.dto.*;
 import rph.entity.RefreshToken;
 import rph.entity.User;
-import rph.exception.CommonErrorCode;
+import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.ErrorResponse;
 import rph.exception.RestApiException;
 import rph.external.GoogleTokenVerifier;
@@ -92,9 +92,7 @@ public class UserService {
     return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
     }
 
-    public boolean isUsernameAvailable(String username) {
-    return !userRepository.existsByUsername(username);
-    }
+  
     
     public LoginResponse googleLogin(GoogleLoginRequest request) {
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
@@ -112,9 +110,11 @@ public class UserService {
             throw new RestApiException(CommonErrorCode.NEED_SIGNUP_GOOGLE, data);
         }
     
-        String token = jwtTokenProvider.generateToken(user.getUsername());
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+
     
-        return new LoginResponse(true, "로그인 성공!", token);
+        return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
     }
 
     public LoginResponse googleSignup(GoogleSignupRequest request){
@@ -128,8 +128,10 @@ public class UserService {
         user.setGoogleId(payload.getSubject());
         userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(user.getUsername());
-        return new LoginResponse(true, "로그인 성공!", token);
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+
+        return new LoginResponse(true, "로그인 성공!", accessToken,refreshToken);
     }
      public boolean isUsernameAvailable(String username) {
     return !userRepository.existsByUsername(username);

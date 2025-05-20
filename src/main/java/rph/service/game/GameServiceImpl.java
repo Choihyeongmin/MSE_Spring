@@ -6,7 +6,7 @@ import rph.dto.game.GameResultRequest;
 import rph.dto.game.GameResultResponse;
 import rph.dto.game.relativeRecodeResponse;
 import rph.entity.GameResult;
-import rph.exception.CommonErrorCode;
+import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.RestApiException;
 import rph.entity.User;
 import rph.repository.GameResultRepository;
