@@ -41,6 +41,8 @@ public class User {
     private int level = 1;
     private int coins = 0;
 
+    private String role; 
+
     public void addExpAndCoins(int expGain, int coinGain) {
         this.exp += expGain;
         this.coins += coinGain;

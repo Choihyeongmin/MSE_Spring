@@ -66,6 +66,7 @@ public class UserService {
         user.setExp(0);
         user.setLevel(1);
         user.setCoins(0);
+        user.setRole("ROLE_USER");
 
         userRepository.save(user);
 

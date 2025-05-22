@@ -1,11 +1,12 @@
 package rph.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import rph.entity.User;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -15,17 +16,14 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-    // ✅ 현재 로그인된 사용자의 실제 User 객체
+    //  현재 로그인된 사용자의 실제 User 객체
     public User getUser() {
         return user;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한이 없으면 빈 리스트 반환 (이후 Role 추가 시 변경 가능)
-        return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority(user.getRole())); // role 기반 리스트 반환 
     }
-
     @Override
     public String getPassword() {
         return user.getPassword();
