@@ -11,7 +11,7 @@ public class AdminController {
 
     @PostMapping("/item")
     public ResponseEntity<String> addItem() {
-        // 나중에 구현
+        // 아이템 추가 구현
         return ResponseEntity.ok("아이템 추가 로직 위치");
     }
 
