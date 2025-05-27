@@ -74,7 +74,6 @@ public class UserServiceImpl implements UserService {
         }
 
         String hashedInput = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
-
         if (!hashedInput.equals(user.getPassword())) {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }

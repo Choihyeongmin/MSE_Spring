@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import rph.exception.TokenException;
 import rph.exception.ErrorCode.TokenErrorCode;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -11,7 +12,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");//.env
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     private final long EXPIRATION = 1000L * 60 * 120; // 2시간
     private final long R_EXPRIRATION = 1000L *60 *60 *24 *7; //7일

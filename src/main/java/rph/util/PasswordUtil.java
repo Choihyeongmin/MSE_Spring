@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class PasswordUtil {  //salt and pepper
 
-    @Value("${PASSWORD_PEPPER}")
-    private static final String PEPPER = System.getenv("PASSWORD_PEPPER"); //.env
+    @Value("${Password_Pepper}")
+    private static String PEPPER;
 
     // Salt 생성
     public static String generateSalt() {
