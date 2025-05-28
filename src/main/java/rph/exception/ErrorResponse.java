@@ -25,7 +25,7 @@ public class ErrorResponse {
     private final List<ValidationError> errors;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Map<String, Object> data; // 추가 정보 (선택적)
+    private final Map<String, Object> data; // extra information (optional)
 
     @Getter
     @Builder

@@ -12,12 +12,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class User {
 
-    // DB 고유 ID (Primary Key)
+    // DB innate ID (Primary Key)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 로그인용 아이디 (중복 불가, 구글 로그인시 email이 아이디)
+    // login ID (중복 불가, 구글 로그인시 email이 아이디)
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -25,15 +25,15 @@ public class User {
     @Column(nullable = false)
     private String salt;
 
-    // 로그인용 비밀번호
+    // login password
     @Column(nullable = true)
     private String password;
 
-    // 닉네임 (표시용 이름)
+    // nickname (표시용 이름)
     @Column(unique = true, nullable = false)
     private String nickname;
 
-    //구글 로그인용
+    // Google login ID
     @Column(unique = true)
     private String googleId;
 

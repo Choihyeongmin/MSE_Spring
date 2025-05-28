@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class RefreshToken {
 
     @Id
-    private String username; // 또는 userId
+    private String username;
 
     @Column(nullable = false)
     private String refreshToken;
