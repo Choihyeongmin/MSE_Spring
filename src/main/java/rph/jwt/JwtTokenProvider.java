@@ -15,13 +15,13 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    private final long EXPIRATION = 1000L * 60 * 120; // 2시간
-    private final long R_EXPRIRATION = 1000L *60 *60 *24 *7; //7일
+    private final long EXPIRATION = 1000L * 60 * 120; // 2 hours
+    private final long R_EXPRIRATION = 1000L *60 *60 *24 *7; // 7days
 
     public String generateAccessToken(String username) {
     return Jwts.builder()
             .setSubject(username)
-            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION)) // 30분
+            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION)) // 30 minutes
             .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
             .compact();
     }
@@ -29,7 +29,7 @@ public class JwtTokenProvider {
     public String generateRefreshToken(String username) {
     return Jwts.builder()
             .setSubject(username)
-            .setExpiration(new Date(System.currentTimeMillis() + R_EXPRIRATION)) // 7일
+            .setExpiration(new Date(System.currentTimeMillis() + R_EXPRIRATION)) // 7 days
             .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
             .compact();
     }

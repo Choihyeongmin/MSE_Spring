@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return new SignupResponse(true, "회원가입 성공!");
+        return new SignupResponse(true, "Signup Success!");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
         refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken));
 
-        return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
+        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
 
-        return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
+        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
 
-        return new LoginResponse(true, "로그인 성공!", accessToken, refreshToken);
+        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override

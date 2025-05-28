@@ -42,20 +42,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
 
-            //  username → UserDetails 로 변경
+            //  (from) username → (to) UserDetails
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            //  Spring Security 인증 객체 생성
+            // Create Spring Security authentication object
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities() // 권한 정보 포함
+                            userDetails.getAuthorities() // include authentication information
                     );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            //  인증 객체 등록
+            //Register authentication object
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

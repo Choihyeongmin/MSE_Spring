@@ -17,19 +17,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // login ID (중복 불가, 구글 로그인시 email이 아이디)
+    // Login ID (Username must be unique, if Google login, Username == Email)
     @Column(unique = true, nullable = false)
     private String username;
 
-    //salt
+    //Salt
     @Column(nullable = false)
     private String salt;
 
-    // login password
+    // Login password
     @Column(nullable = true)
     private String password;
 
-    // nickname (표시용 이름)
+    // Nickname (Display Name)
     @Column(unique = true, nullable = false)
     private String nickname;
 

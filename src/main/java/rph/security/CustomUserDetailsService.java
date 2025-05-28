@@ -12,18 +12,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // 생성자 주입
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    //  이 메서드는 Spring Security가 자동으로 호출함
+    //  Spring Security automatically call this
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // DB에서 username으로 유저 조회
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("유저 없음");
+            throw new UsernameNotFoundException("User not found");
         }
         return new CustomUserDetails(user);
     }
