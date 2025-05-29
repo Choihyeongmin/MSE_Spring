@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     //  Spring Security automatically call this
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // DB에서 username으로 유저 조회
+        // Retrieve user by username from the database
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");

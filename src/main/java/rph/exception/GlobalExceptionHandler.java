@@ -103,13 +103,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+
+    //AccessDeniedException 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+        .code("ACCESS_DENIED")
+        .message("접근 권한이 없습니다. 관리자만 사용할 수 있는 기능입니다.")
+        .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
     // Global exception handler (fallback)
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+        protected ResponseEntity<ErrorResponse> handleException(Exception e) {
         ErrorResponse response = ErrorResponse.builder()
                 .code(CommonErrorCode.INTERNAL_SERVER_ERROR.name())
                 .message(CommonErrorCode.INTERNAL_SERVER_ERROR.getMessage())
                 .build();
         return ResponseEntity.status(CommonErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(response);
-    }
+        }
 }
