@@ -12,7 +12,7 @@ import rph.jwt.JwtTokenProvider;
 import rph.security.CustomUserDetailsService;
 
 @Configuration
-@EnableMethodSecurity  // Role 기반 securtiy를 도와줌. 
+@EnableMethodSecurity  // Help role base securtiy. 
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;

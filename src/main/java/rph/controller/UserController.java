@@ -29,6 +29,7 @@ import rph.dto.user.SignupRequest;
 import rph.dto.user.SignupResponse;
 import rph.dto.user.TokenRefreshRequest;
 import rph.dto.user.TokenRefreshResponse;
+import rph.dto.user.UserUpdateRequest;
 import rph.service.UserService;
 
 @RestController
@@ -102,7 +103,18 @@ public class UserController {
         user.getCoins()
     );
     return ResponseEntity.ok(response);
-    }   
+    }
+    
+    @PutMapping("/me")
+    public ResponseEntity<String> updateUser(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestBody @Valid UserUpdateRequest request
+    ) {
+        userService.updateUser(userDetails.getUser(), request);
+        return ResponseEntity.ok("User info updated.");
+    }
+
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {

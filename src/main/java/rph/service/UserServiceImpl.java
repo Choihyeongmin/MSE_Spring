@@ -86,6 +86,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updateUser(User user, UserUpdateRequest request) {
+        user.setNickname(request.getNickname());
+        
+        String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
+        user.setPassword(hashedPassword);
+        
+        userRepository.save(user);
+    }
+
+
+    @Override
     public LoginResponse googleLogin(GoogleLoginRequest request) {
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
 

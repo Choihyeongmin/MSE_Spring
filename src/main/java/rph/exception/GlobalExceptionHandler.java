@@ -109,7 +109,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         ErrorResponse response = ErrorResponse.builder()
         .code("ACCESS_DENIED")
-        .message("접근 권한이 없습니다. 관리자만 사용할 수 있는 기능입니다.")
+        .message("Access denied. This feature is for administrators only.")
         .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }

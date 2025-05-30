@@ -1,5 +1,6 @@
 package rph.service;
 
+import rph.entity.User;
 import rph.dto.user.*;
 
 public interface UserService {
@@ -8,4 +9,5 @@ public interface UserService {
     LoginResponse googleLogin(GoogleLoginRequest request);
     LoginResponse googleSignup(GoogleSignupRequest request);
     boolean isUsernameAvailable(String username);
+    void updateUser(User user, UserUpdateRequest request);
 }
