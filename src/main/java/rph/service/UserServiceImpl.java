@@ -95,6 +95,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
+
 
     @Override
     public LoginResponse googleLogin(GoogleLoginRequest request) {

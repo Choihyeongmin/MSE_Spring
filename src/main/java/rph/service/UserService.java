@@ -10,4 +10,5 @@ public interface UserService {
     LoginResponse googleSignup(GoogleSignupRequest request);
     boolean isUsernameAvailable(String username);
     void updateUser(User user, UserUpdateRequest request);
+    void deleteUser(User user);
 }
