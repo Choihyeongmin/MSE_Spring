@@ -48,6 +48,10 @@ public class UserServiceImpl implements UserService {
             throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
 
+         if (userRepository.existsByNickname(request.getNickname())) {
+        throw new UserException(UserErrorCode.NICKNAME_DUPLICATED);
+        }
+
         String salt = PasswordUtil.generateSalt();
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
 
@@ -95,9 +99,31 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Override
+        @Override
     public void deleteUser(User user) {
+        if (user == null) {
+            throw new UserException(UserErrorCode.USER_NOT_FOUND); // 유저가 null인 경우
+        }
+
+        try {
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new UserException(UserErrorCode.USER_DELETE_FAILED); // 삭제 실패 시 예외
+        }
+    }
+
+    @Override
+    public void deleteUserByAdmin(String username) {
+    User user = userRepository.findByUsername(username);
+        if (user == null) {
+        throw new UserException(UserErrorCode.USER_NOT_FOUND); // 유저가 null인 경우 
+        }
+        try {
         userRepository.delete(user);
+        } 
+        catch (Exception e) {
+        throw new UserException(UserErrorCode.USER_DELETE_FAILED); // 삭제 실패 시 예외
+        }
     }
 
 
