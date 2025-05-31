@@ -29,6 +29,7 @@ import rph.dto.user.SignupRequest;
 import rph.dto.user.SignupResponse;
 import rph.dto.user.TokenRefreshRequest;
 import rph.dto.user.TokenRefreshResponse;
+import rph.dto.user.UserUpdateRequest;
 import rph.service.UserService;
 
 @RestController
@@ -46,8 +47,8 @@ public class UserController {
 
    @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequest request) {
-    userService.signup(request);  // 예외 발생 시 GlobalExceptionHandler가 처리
-    return ResponseEntity.ok("회원가입 성공!");
+    userService.signup(request);  
+    return ResponseEntity.ok("Signup Success!");
     }
 
 
@@ -57,14 +58,14 @@ public class UserController {
     if (!userService.isUsernameAvailable(username)) {
         throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
     }
-    return ResponseEntity.ok("사용 가능한 아이디입니다.");
+    return ResponseEntity.ok("The username is available.");
     }
 
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
-    LoginResponse response = userService.login(request);  // 실패 시 내부에서 예외 발생
-    return ResponseEntity.ok(response);  // 성공만 처리
+    LoginResponse response = userService.login(request);  
+    return ResponseEntity.ok(response);  // only response succuess
     }
 
     @PostMapping("/refresh")
@@ -102,12 +103,30 @@ public class UserController {
         user.getCoins()
     );
     return ResponseEntity.ok(response);
-    }   
+    }
+    
+    @PutMapping("/me")    // User data update, can change Password + Nickname
+    public ResponseEntity<String> updateUser(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestBody @Valid UserUpdateRequest request
+    ) {
+        userService.updateUser(userDetails.getUser(), request);
+        return ResponseEntity.ok("User info updated.");
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    User user = userDetails.getUser();  // 현재 로그인한 유저 객체
+    userService.deleteUser(user);
+    return ResponseEntity.ok("Your account has been successfully deleted.");
+    }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-    return ResponseEntity.ok("로그아웃 성공 (클라이언트에서 토큰 삭제하세요)"); //클라에서 토큰을 삭제 해야함, jwt 자체 삭제해서 헤더에 인증안오게
-    }
+    return ResponseEntity.ok("Logout successful (please delete the token on the client side)"); 
+    // The client should delete the token; ensure the JWT is removed so it won't be sent in the Authorization header. 
+   }
 
     @PostMapping("/google/login")
     public ResponseEntity<LoginResponse> googleLogin(@RequestBody GoogleLoginRequest request) {

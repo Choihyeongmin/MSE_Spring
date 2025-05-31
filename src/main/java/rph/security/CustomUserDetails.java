@@ -1,11 +1,12 @@
 package rph.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import rph.entity.User;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -15,15 +16,14 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-    // ✅ 현재 로그인된 사용자의 실제 User 객체
+    // The actual User object of the currently logged-in user
     public User getUser() {
         return user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한이 없으면 빈 리스트 반환 (이후 Role 추가 시 변경 가능)
-        return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority(user.getRole())); // Returns a list based on the user's role
     }
 
     @Override
@@ -38,21 +38,21 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // 계정 만료 여부
+        return true; // Indicates whether the account has not expired
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // 계정 잠김 여부
-    }
+        return true; // Indicates whether the account is not locked
+        }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // 비밀번호 만료 여부
+        return true; // Indicates whether the credentials (password) are not expired
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // 계정 활성화 여부
+        return true; // Indicates whether the account is enabled
     }
 }

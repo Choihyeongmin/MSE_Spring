@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class PasswordUtil {  //salt and pepper
 
-    @Value("${PASSWORD_PEPPER}")
-    private static final String PEPPER = System.getenv("PASSWORD_PEPPER"); //.env
+    @Value("${Password_Pepper}")
+    private static String PEPPER;
 
-    // Salt 생성
+    // Create Salt
     public static String generateSalt() {
         byte[] salt = new byte[16];
         new SecureRandom().nextBytes(salt);
         return Base64.getEncoder().encodeToString(salt);
     }
 
-    // 해시 처리
+    // Hashing process
     public static String hashPassword(String rawPassword, String salt) {
         try {
             String toHash = rawPassword + salt + PEPPER;
