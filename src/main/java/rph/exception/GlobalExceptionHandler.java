@@ -103,17 +103,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-
-    //AccessDeniedException 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-        .code("ACCESS_DENIED")
-        .message("Access denied. This feature is for administrators only.")
-        .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
-
     // Global exception handler (fallback)
     @ExceptionHandler(Exception.class)
         protected ResponseEntity<ErrorResponse> handleException(Exception e) {

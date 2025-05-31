@@ -105,7 +105,7 @@ public class UserController {
     return ResponseEntity.ok(response);
     }
     
-    @PutMapping("/me")
+    @PutMapping("/me")    // User data update, can change Password + Nickname
     public ResponseEntity<String> updateUser(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestBody @Valid UserUpdateRequest request
@@ -114,6 +114,12 @@ public class UserController {
         return ResponseEntity.ok("User info updated.");
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    User user = userDetails.getUser();  // 현재 로그인한 유저 객체
+    userService.deleteUser(user);
+    return ResponseEntity.ok("Your account has been successfully deleted.");
+    }
 
 
     @PostMapping("/logout")
