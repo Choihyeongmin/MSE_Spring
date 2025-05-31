@@ -66,7 +66,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
         ErrorResponse response = ErrorResponse.builder()
                 .code("ACCESS_DENIED")
-                .message("Access is denied")
+                .message("Access is denied, administrators only ")
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
