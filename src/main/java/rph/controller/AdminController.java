@@ -14,7 +14,7 @@ import rph.service.UserService;
 import rph.service.item.ItemService;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 

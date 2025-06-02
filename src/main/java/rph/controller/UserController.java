@@ -33,7 +33,7 @@ import rph.dto.user.UserUpdateRequest;
 import rph.service.UserService;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 public class UserController {
     
     @Autowired
