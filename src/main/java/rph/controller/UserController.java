@@ -45,7 +45,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-   @PostMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequest request) {
     userService.signup(request);  
     return ResponseEntity.ok("Signup Success!");
