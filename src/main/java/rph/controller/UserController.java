@@ -68,7 +68,7 @@ public class UserController {
     return ResponseEntity.ok(response);  // only response succuess
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refresh")  // Get new AccessToken
     public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody TokenRefreshRequest request) {
         String refreshToken = request.getRefreshToken();
 
@@ -89,10 +89,9 @@ public class UserController {
         return ResponseEntity.ok(new TokenRefreshResponse(newAccessToken));
     }
 
-
     public record UserInfoResponse(String username, String nickname, int exp, int level, int coins) {}
 
-    @GetMapping("/me")
+    @GetMapping("/me") //Get my information
     public ResponseEntity<UserInfoResponse> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
     User user = userDetails.getUser();
     UserInfoResponse response = new UserInfoResponse(
@@ -114,13 +113,12 @@ public class UserController {
         return ResponseEntity.ok("User info updated.");
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping("/me") // Delete myself
     public ResponseEntity<String> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
     User user = userDetails.getUser();  // 현재 로그인한 유저 객체
     userService.deleteUser(user);
     return ResponseEntity.ok("Your account has been successfully deleted.");
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
