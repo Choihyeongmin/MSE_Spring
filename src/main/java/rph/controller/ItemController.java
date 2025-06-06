@@ -13,7 +13,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/api/item")
 @RequiredArgsConstructor
 public class ItemController {
 
@@ -33,11 +33,4 @@ public class ItemController {
     public List<ItemResponse> getItemsByType(@PathVariable String type) {
         return itemService.getItemsByType(type);
     }
-
-    @PostMapping
-    public ResponseEntity<ItemResponse> saveItem(@Valid@RequestBody ItemRequest item){
-        ItemResponse response  = itemService.saveItem(item);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
 }

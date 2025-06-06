@@ -10,4 +10,5 @@ public class ItemRequest {
     private String description;
     private int price;
     private String type;
+    private boolean isStackable;
 }

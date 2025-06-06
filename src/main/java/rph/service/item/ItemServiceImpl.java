@@ -51,4 +51,29 @@ public class ItemServiceImpl implements ItemService {
         item.setType(ItemType.valueOf(request.getType().toUpperCase()));
         return ItemResponse.from(itemRepository.save(item));
     }
+
+    @Override
+    public ItemResponse updateItem(ItemRequest request, Long id) {
+        // 기존 item 조회
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
+
+        // 필드 업데이트
+        item.setName(request.getName());
+        item.setPrice(request.getPrice());
+        item.setDescription(request.getDescription());
+        item.setType(ItemType.valueOf(request.getType().toUpperCase()));
+        item.setStackable(request.isStackable());  // isStackable 필드도 잊지 말기!
+
+        // 저장 후 반환
+        return ItemResponse.from(itemRepository.save(item));
+    }
+
+    @Override
+    public void deleteItem(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found with id: " + id));
+
+        itemRepository.delete(item);
+    }
 }

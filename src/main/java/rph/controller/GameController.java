@@ -17,7 +17,7 @@ import rph.service.game.GameService;
 
 
 @RestController
-@RequestMapping("/games")
+@RequestMapping("/api/game")
 @RequiredArgsConstructor
 public class GameController {
 

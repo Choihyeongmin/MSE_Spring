@@ -9,4 +9,6 @@ public interface ItemService {
     ItemResponse getItemById(Long itemId);
     List<ItemResponse> getItemsByType(String type);
     ItemResponse saveItem(ItemRequest item);
+    ItemResponse updateItem(ItemRequest item, Long id);
+    void deleteItem(Long id);
 }
