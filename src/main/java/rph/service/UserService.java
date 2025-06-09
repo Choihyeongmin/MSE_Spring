@@ -11,4 +11,5 @@ public interface UserService {
     boolean isUsernameAvailable(String username);
     void updateUser(User user, UserUpdateRequest request);
     void deleteUser(User user);
+    void deleteUserByAdmin(String username);
 }
