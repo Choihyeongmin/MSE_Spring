@@ -32,6 +32,7 @@ public class AdminController {
     public ResponseEntity<String> deleteUserByAdmin(@PathVariable String username) {
     userService.deleteUserByAdmin(username);   // UserService
     return ResponseEntity.ok("User '" + username + "' has been deleted by admin.");
+    }
     @PutMapping("/item/update/{id}")
     public ResponseEntity<ItemResponse> putMethodName(@PathVariable Long id, @Valid@RequestBody ItemRequest item) {
         ItemResponse response  = itemService.updateItem(item, id);
