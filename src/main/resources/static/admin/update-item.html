@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Update Item</title>
+    <link rel="stylesheet" href="/admin/css/style.css" />
+</head>
+<body>
+    <h1>Update Item</h1>
+    <form id="update-item-form">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="text" id="description" placeholder="Description" required />
+        <input type="number" id="price" placeholder="Price" required />
+        <input type="text" id="type" placeholder="Type" required />
+        <label>
+            Stackable: <input type="checkbox" id="isStackable" />
+        </label>
+        <button type="submit">Update</button>
+    </form>
+    <script src="/admin/js/update-item.js"></script>
+</body>
+</html>

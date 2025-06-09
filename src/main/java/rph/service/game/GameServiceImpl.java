@@ -9,12 +9,15 @@ import rph.entity.GameResult;
 import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.RestApiException;
 import rph.entity.User;
+import rph.entity.UserItem;
 import rph.repository.GameResultRepository;
+import rph.repository.UserItemRepository;
 import rph.repository.UserRepository;
 import rph.service.ranking.RankingService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,17 +26,29 @@ public class GameServiceImpl implements GameService {
 
     private final GameResultRepository gameResultRepository;
     private final UserRepository userRepository;
+    private final UserItemRepository userItemRepository;
     private final RankingService rankingService;
 
     @Override
     public GameResultResponse saveGameResult(GameResultRequest request) {
         User player1 = userRepository.findById(request.getPlayer1Id())
-                .orElseThrow(() -> new IllegalArgumentException("player1 not found"));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
         User player2 = userRepository.findById(request.getPlayer2Id())
-                .orElseThrow(() -> new IllegalArgumentException("player2 not found"));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
         User winner = request.getWinnerId() == null ? null :
                 userRepository.findById(request.getWinnerId())
-                .orElseThrow(() -> new IllegalArgumentException("winner not found"));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
+
+                // player1 아이템 사용 처리
+        useItem(player1, 8L, request.getPlayer1UseItem1());
+        useItem(player1, 9L, request.getPlayer1UseItem2());
+        useItem(player1, 10L, request.getPlayer1UseItem3());
+
+        // player2 아이템 사용 처리
+        useItem(player2, 8L, request.getPlayer2UseItem1());
+        useItem(player2, 9L, request.getPlayer2UseItem2());
+        useItem(player2, 10L, request.getPlayer2UseItem3());
+
 
         GameResult gameResult = new GameResult();
         gameResult.setPlayer1(player1);
@@ -45,6 +60,7 @@ public class GameServiceImpl implements GameService {
         gameResult.setScoreDiff(request.getScoreDiff());
         gameResult.setStartTime(LocalDateTime.now());
         gameResult.setEndTime(LocalDateTime.now());
+        
 
         GameResultResponse response = GameResultResponse.from(gameResultRepository.save(gameResult));
         rankingService.updateRanking(player1, player2, winner, request.isDraw());
@@ -112,4 +128,21 @@ public class GameServiceImpl implements GameService {
         userRepository.save(player1);
         userRepository.save(player2);
     }
+
+    private void useItem(User player, Long itemId, int countToUse) {
+    if (countToUse <= 0) {
+        return;  // 사용 안 했으면 패스
+    }
+
+    Optional<UserItem> userItemOpt = userItemRepository.findByUserIdAndItemId(player.getId(), itemId);
+    UserItem userItem = userItemOpt.orElseThrow(() ->
+            new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR));
+
+    if (userItem.getCount() < countToUse) {
+        throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+    }
+
+    userItem.setCount(userItem.getCount() - countToUse);
+    userItemRepository.save(userItem);
+}
 }

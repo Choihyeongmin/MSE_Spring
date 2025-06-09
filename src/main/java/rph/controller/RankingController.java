@@ -10,7 +10,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/rankings")
+@RequestMapping("/api/ranking")
 @RequiredArgsConstructor
 public class RankingController {
 

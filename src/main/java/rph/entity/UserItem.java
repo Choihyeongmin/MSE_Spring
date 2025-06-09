@@ -24,5 +24,8 @@ public class UserItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    private int count;  // ★ 추가: 보유 개수
+
     private LocalDateTime ownedAt;
+
 }

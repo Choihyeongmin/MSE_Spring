@@ -12,7 +12,7 @@ import rph.service.useritem.UserItemService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user-items")
+@RequestMapping("/api/user-item")
 @RequiredArgsConstructor
 public class UserItemController {
     private final UserItemService userItemService;

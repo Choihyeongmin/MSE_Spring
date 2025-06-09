@@ -13,6 +13,7 @@ public class ItemResponse {
     private String description;
     private int price;
     private String type;
+    private boolean isStackable;
 
     public static ItemResponse from(Item item) {
         return new ItemResponse(
@@ -20,7 +21,8 @@ public class ItemResponse {
             item.getName(),
             item.getDescription(),
             item.getPrice(),
-            item.getType().name()
+            item.getType().name(),
+            item.isStackable()
         );
     }
 }
