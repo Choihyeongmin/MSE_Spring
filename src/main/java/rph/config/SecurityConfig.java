@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeHttpRequests()
-                .antMatchers("/user/login", "/user/signup", "/user/signup/**","/admin/*.html","/admin/js/*.js","/admin/css/*.css","/user/google/**").permitAll().anyRequest().authenticated()
+                .antMatchers("/user/login", "/user/signup", "/user/signup/**","/admin/*.html","/admin/js/*.js","/admin/css/*.css","/user/google/**", "/**").permitAll().anyRequest().authenticated()
             .and()
             .addFilterBefore(
                 new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),

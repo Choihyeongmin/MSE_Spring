@@ -24,7 +24,7 @@ public class GameResultResponse {
             gameResult.getId(),
             gameResult.getPlayer1().getId(),
             gameResult.getPlayer2().getId(),
-            gameResult.getWinner().getId(),
+            gameResult.getWinner() != null ? gameResult.getWinner().getId() : null,  // ✅ null-safe
             gameResult.isDraw(),
             gameResult.getTileOwnedPlayer1(),
             gameResult.getTileOwnedPlayer2(),
@@ -32,4 +32,3 @@ public class GameResultResponse {
         );
     }
 }
-
