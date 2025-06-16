@@ -28,33 +28,38 @@ import javax.validation.constraints.Null;
 @RequiredArgsConstructor
 public class UserItemServiceImpl implements UserItemService {
 
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
-    private final UserItemRepository userItemRepository;
+    private final UserRepository userRepository; // Repository for user
+    private final ItemRepository itemRepository; // Repository for item
+    private final UserItemRepository userItemRepository; // Repository for user-item relationship
 
     @Override
-    @Transactional  // ★ 중요! 트랜잭션 적용 (예외 발생 시 롤백)
+    @Transactional
     public UserItemResponse purchaseItem(UserItemRequest request) {
+        // Find user and item
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
 
+        // Find if user already owns this item
         Optional<UserItem> userItemOpt = userItemRepository.findByUserIdAndItemId(request.getUserId(), request.getItemId());
         UserItem userItem;
 
+        // If item is not stackable and already owned, throw exception
         if (!item.isStackable() && userItemOpt.isPresent()) {
             throw new UserItemException(UserItemErrorCode.ITEM_OWNED);
         }
 
-        // ★ 여기서부터 안전하게 코인 차감
+        // Check coin balance
         if (user.getCoins() < item.getPrice()) {
             throw new UserItemException(UserItemErrorCode.NO_COIN);
         }
 
+        // Deduct coins
         user.setCoins(user.getCoins() - item.getPrice());
         userRepository.save(user);
 
+        // Save or update user item
         if (item.isStackable()) {
             if (userItemOpt.isPresent()) {
                 userItem = userItemOpt.get();
@@ -81,13 +86,14 @@ public class UserItemServiceImpl implements UserItemService {
 
     @Override
     public boolean checkUserItem(Long userId, Long itemId) {
+        // Check if user owns the item
         Optional<UserItem> userItem = userItemRepository.findByUserIdAndItemId(userId, itemId);
-        return userItem.isPresent();  // 있으면 true, 없으면 false
+        return userItem.isPresent();  
     }
-
 
     @Override
     public List<UserItemResponse> getItemsByUserId(Long userId) {
+        // Get all items owned by user
         return userItemRepository.findByUserId(userId).stream()
                 .map(UserItemResponse::from)
                 .collect(Collectors.toList()); 

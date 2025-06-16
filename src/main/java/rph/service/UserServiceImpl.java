@@ -24,10 +24,10 @@ import rph.util.PasswordUtil;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final GoogleTokenVerifier tokenVerifier;
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final GoogleTokenVerifier tokenVerifier; // For verifying Google ID tokens
+    private final UserRepository userRepository; // Repository for user
+    private final JwtTokenProvider jwtTokenProvider; // JWT token provider
+    private final RefreshTokenRepository refreshTokenRepository; // Repository for refresh tokens
 
     @Autowired
     public UserServiceImpl(
@@ -44,14 +44,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public SignupResponse signup(SignupRequest request) {
+        // Check for duplicated username and nickname
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
-
-         if (userRepository.existsByNickname(request.getNickname())) {
-        throw new UserException(UserErrorCode.NICKNAME_DUPLICATED);
+        if (userRepository.existsByNickname(request.getNickname())) {
+            throw new UserException(UserErrorCode.NICKNAME_DUPLICATED);
         }
 
+        // Create new user with hashed password
         String salt = PasswordUtil.generateSalt();
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
 
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+        // Check user existence and verify password
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
             throw new UserException(UserErrorCode.USER_NOT_FOUND);
@@ -82,55 +84,54 @@ public class UserServiceImpl implements UserService {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
+        // Generate and return tokens
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
         refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken));
 
-        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
+        return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override
     public void updateUser(User user, UserUpdateRequest request) {
+        // Update user nickname and password
         user.setNickname(request.getNickname());
-        
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
         user.setPassword(hashedPassword);
-        
         userRepository.save(user);
     }
 
-        @Override
+    @Override
     public void deleteUser(User user) {
+        // Delete current user
         if (user == null) {
-            throw new UserException(UserErrorCode.USER_NOT_FOUND); // 유저가 null인 경우
+            throw new UserException(UserErrorCode.USER_NOT_FOUND); 
         }
-
         try {
             userRepository.delete(user);
         } catch (Exception e) {
-            throw new UserException(UserErrorCode.USER_DELETE_FAILED); // 삭제 실패 시 예외
+            throw new UserException(UserErrorCode.USER_DELETE_FAILED); 
         }
     }
 
     @Override
     public void deleteUserByAdmin(String username) {
-    User user = userRepository.findByUsername(username);
+        // Admin deletes a user by username
+        User user = userRepository.findByUsername(username);
         if (user == null) {
-        throw new UserException(UserErrorCode.USER_NOT_FOUND); // 유저가 null인 경우 
+            throw new UserException(UserErrorCode.USER_NOT_FOUND); 
         }
         try {
-        userRepository.delete(user);
-        } 
-        catch (Exception e) {
-        throw new UserException(UserErrorCode.USER_DELETE_FAILED); // 삭제 실패 시 예외
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new UserException(UserErrorCode.USER_DELETE_FAILED);
         }
     }
 
-
     @Override
     public LoginResponse googleLogin(GoogleLoginRequest request) {
+        // Verify Google token and login if user exists
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
-
         String email = payload.getEmail();
         String googleId = payload.getSubject();
 
@@ -146,33 +147,31 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
 
-        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
+        return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override
     public LoginResponse googleSignup(GoogleSignupRequest request) {
+        // Signup using Google account info
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
-
-        if (request.getUsername().equals(payload.getEmail())) {
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
-        }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setNickname(request.getNickname());
         user.setGoogleId(payload.getSubject());
-        user.setRole("ROLE_USER"); // 꼭 추가
+        user.setRole("ROLE_USER"); 
 
         userRepository.save(user);
 
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
 
-        return new LoginResponse(true, "Login Success!", accessToken, refreshToken);
+        return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
     @Override
     public boolean isUsernameAvailable(String username) {
+        // Check if username is available
         return !userRepository.existsByUsername(username);
     }
 }

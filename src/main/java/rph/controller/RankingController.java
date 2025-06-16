@@ -14,16 +14,17 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class RankingController {
 
-    private final RankingService rankingService;
+    private final RankingService rankingService; // Service for ranking operations
 
     @GetMapping
     public List<RankingResponse> getAllRankings() {
+        // Get all rankings
         return rankingService.getAllRankings();
     }
-    
+
     @GetMapping("/top/{count}")
     public List<RankingResponse> getTopRankings(@Valid @PathVariable int count) {
+        // Get top 'count' rankings
         return rankingService.getTopRankings(count);
     }
-    
 }
