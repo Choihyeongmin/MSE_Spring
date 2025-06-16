@@ -23,8 +23,14 @@ public class RankingController {
     }
 
     @GetMapping("/top/{count}")
-    public List<RankingResponse> getTopRankings(@Valid @PathVariable int count) {
+    public List<RankingResponse> getTopRankings(@Valid @PathVariable int count) { 
         // Get top 'count' rankings
         return rankingService.getTopRankings(count);
+    }
+
+    @GetMapping("/top")
+    public List<RankingResponse> getTopRankingsByQueryParam(@RequestParam int count) {
+        // Get top 'count' rankings by Query parameter
+    return rankingService.getTopRankings(count);
     }
 }
