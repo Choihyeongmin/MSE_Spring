@@ -4,6 +4,10 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * Entity representing a user account.
+ * Includes login credentials, nickname, level, and role.
+ */
 @Entity
 @Table(name = "users")
 @Getter
@@ -12,41 +16,42 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class User {
 
-    // DB innate ID (Primary Key)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // Primary key (auto-incremented)
 
-    // Login ID (Username must be unique, if Google login, Username == Email)
     @Column(unique = true, nullable = false)
-    private String username;
+    private String username; // Login ID (can be email if using Google login)
 
-    //Salt
     @Column(nullable = true)
-    private String salt;
+    private String salt; // Salt for password hashing (null for Google login users)
 
-    // Login password
     @Column(nullable = true)
-    private String password;
+    private String password; // Hashed password (nullable if Google login)
 
-    // Nickname (Display Name)
     @Column(unique = true, nullable = false)
-    private String nickname;
+    private String nickname; // Display name shown in the game
 
-    // Google login ID
     @Column(unique = true)
-    private String googleId;
+    private String googleId; // ID for Google OAuth login (optional)
 
-    private int exp = 0;
-    private int level = 1;
-    private int coins = 0;
+    private int exp = 0;   // Experience points
+    private int level = 1; // User level
+    private int coins = 0; // Coin balance
 
-    private String role; 
+    private String role;   // Role (e.g., ROLE_USER, ROLE_ADMIN)
 
+    /**
+     * Adds experience and coins to the user.
+     * Levels up for every 100 EXP.
+     *
+     * @param expGain   amount of EXP to add
+     * @param coinGain  amount of coins to add
+     */
     public void addExpAndCoins(int expGain, int coinGain) {
         this.exp += expGain;
         this.coins += coinGain;
-    
+
         while (this.exp >= 100) {
             this.exp -= 100;
             this.level += 1;

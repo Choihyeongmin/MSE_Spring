@@ -26,15 +26,19 @@ import rph.repository.UserItemRepository;
 import rph.repository.UserRepository;
 import rph.util.PasswordUtil;
 
+/**
+ * Service implementation for user-related operations:
+ * signup, login, profile update, deletion, and Google login.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final GoogleTokenVerifier tokenVerifier; // For verifying Google ID tokens
-    private final UserRepository userRepository; // Repository for user
-    private final JwtTokenProvider jwtTokenProvider; // JWT token provider
-    private final RefreshTokenRepository refreshTokenRepository; // Repository for refresh tokens
-    private final ItemRepository itemRepository; // Repository for item
-    private final UserItemRepository userItemRepository; // Repository for user-item relationship
+    private final GoogleTokenVerifier tokenVerifier;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final ItemRepository itemRepository;
+    private final UserItemRepository userItemRepository;
 
     @Autowired
     public UserServiceImpl(
@@ -53,9 +57,14 @@ public class UserServiceImpl implements UserService {
         this.userItemRepository = userItemRepository;
     }
 
+    /**
+     * Register a new user (local account).
+     * - Hashes password
+     * - Checks for username/nickname duplication
+     * - Gives default items (IDs 1,2,3) × 5
+     */
     @Override
     public SignupResponse signup(SignupRequest request) {
-        // Check for duplicated username and nickname
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
         }
@@ -63,7 +72,6 @@ public class UserServiceImpl implements UserService {
             throw new UserException(UserErrorCode.NICKNAME_DUPLICATED);
         }
 
-        // Create new user with hashed password
         String salt = PasswordUtil.generateSalt();
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
 
@@ -78,9 +86,8 @@ public class UserServiceImpl implements UserService {
         user.setRole("ROLE_USER");
 
         userRepository.save(user);
-        userRepository.save(user); // 저장 후 user.getId() 자동 설정됨
 
-        // Give 5 of itemId 1, 2, 3 each to the new user
+        // Give default items: itemId 1, 2, 3 × 5 each
         for (long itemId = 1L; itemId <= 3L; itemId++) {
             Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
@@ -93,12 +100,17 @@ public class UserServiceImpl implements UserService {
 
             userItemRepository.save(userItem);
         }
+
         return new SignupResponse(true, "Signup Success!");
     }
 
+    /**
+     * Local login.
+     * - Verifies username and password
+     * - Issues JWT access and refresh tokens
+     */
     @Override
     public LoginResponse login(LoginRequest request) {
-        // Check user existence and verify password
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
             throw new UserException(UserErrorCode.USER_NOT_FOUND);
@@ -109,7 +121,6 @@ public class UserServiceImpl implements UserService {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
-        // Generate and return tokens
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
         refreshTokenRepository.save(new RefreshToken(user.getUsername(), refreshToken));
@@ -117,18 +128,22 @@ public class UserServiceImpl implements UserService {
         return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
+    /**
+     * Update user nickname and password.
+     */
     @Override
     public void updateUser(User user, UserUpdateRequest request) {
-        // Update user nickname and password
         user.setNickname(request.getNickname());
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), user.getSalt());
         user.setPassword(hashedPassword);
         userRepository.save(user);
     }
 
+    /**
+     * Delete user account (self-deletion).
+     */
     @Override
     public void deleteUser(User user) {
-        // Delete current user
         if (user == null) {
             throw new UserException(UserErrorCode.USER_NOT_FOUND); 
         }
@@ -139,9 +154,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Admin deletes a user by username.
+     */
     @Override
     public void deleteUserByAdmin(String username) {
-        // Admin deletes a user by username
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UserException(UserErrorCode.USER_NOT_FOUND); 
@@ -153,9 +170,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Google login.
+     * - Verifies ID token
+     * - If user not registered, throws NEED_SIGNUP_GOOGLE
+     */
     @Override
     public LoginResponse googleLogin(GoogleLoginRequest request) {
-        // Verify Google token and login if user exists
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
         String email = payload.getEmail();
         String googleId = payload.getSubject();
@@ -175,9 +196,11 @@ public class UserServiceImpl implements UserService {
         return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
+    /**
+     * Signup using Google account.
+     */
     @Override
     public LoginResponse googleSignup(GoogleSignupRequest request) {
-        // Signup using Google account info
         GoogleIdToken.Payload payload = tokenVerifier.verify(request.getIdToken());
 
         User user = new User();
@@ -194,9 +217,11 @@ public class UserServiceImpl implements UserService {
         return new LoginResponse(user.getId(), true, "Login Success!", accessToken, refreshToken);
     }
 
+    /**
+     * Check if a username is available for signup.
+     */
     @Override
     public boolean isUsernameAvailable(String username) {
-        // Check if username is available
         return !userRepository.existsByUsername(username);
     }
 }

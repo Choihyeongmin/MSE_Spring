@@ -9,6 +9,7 @@ import java.util.Collections;
 
 import org.springframework.stereotype.Component;
 
+// used Google Login
 @Component
 public class GoogleTokenVerifier {
 

@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for handling game result logic.
+ * Includes saving game results, updating rankings, and item usage.
+ */
 @Service
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
@@ -29,8 +33,12 @@ public class GameServiceImpl implements GameService {
     private final UserItemRepository userItemRepository;
     private final RankingService rankingService;
 
+    /**
+     * Save a new game result and update user stats.
+     */
     @Override
     public GameResultResponse saveGameResult(GameResultRequest request) {
+        // Find players and winner (null if draw)
         User player1 = userRepository.findById(request.getPlayer1Id())
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
         User player2 = userRepository.findById(request.getPlayer2Id())
@@ -39,6 +47,7 @@ public class GameServiceImpl implements GameService {
                 userRepository.findById(request.getWinnerId())
                         .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
 
+        // Use items for both players
         useItem(player1, 1L, request.getPlayer1UseItem1());
         useItem(player1, 2L, request.getPlayer1UseItem2());
         useItem(player1, 3L, request.getPlayer1UseItem3());
@@ -47,6 +56,7 @@ public class GameServiceImpl implements GameService {
         useItem(player2, 2L, request.getPlayer2UseItem2());
         useItem(player2, 3L, request.getPlayer2UseItem3());
 
+        // Build and save game result
         GameResult gameResult = new GameResult();
         gameResult.setPlayer1(player1);
         gameResult.setPlayer2(player2);
@@ -57,15 +67,21 @@ public class GameServiceImpl implements GameService {
         gameResult.setScoreDiff(request.getScoreDiff());
         gameResult.setStartTime(LocalDateTime.now());
         gameResult.setEndTime(LocalDateTime.now());
-                System.out.println("전");
+
+        System.out.println("Before saving");
 
         GameResultResponse response = GameResultResponse.from(gameResultRepository.save(gameResult));
-        rankingService.updateRanking(player1, player2, winner, request.isDraw());
 
+        // Update rankings and reward players
+        rankingService.updateRanking(player1, player2, winner, request.isDraw());
         rewardPlayers(player1, player2, winner, request.isDraw());
+
         return response;
     }
 
+    /**
+     * Return all game results where the player participated.
+     */
     @Override
     public List<GameResultResponse> findByPlayerId(Long playerId){
         return gameResultRepository.findByPlayer1_IdOrPlayer2_Id(playerId, playerId).stream()
@@ -73,6 +89,9 @@ public class GameServiceImpl implements GameService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Return relative record between two users (wins, draws, losses).
+     */
     @Override
     public relativeRecodeResponse findRelativeRecode(Long user1, Long user2){
         List<GameResult> gameResults1 = gameResultRepository.findByPlayer1_IdAndPlayer2_Id(user1, user2);
@@ -80,6 +99,7 @@ public class GameServiceImpl implements GameService {
 
         int user1Win = 0, user2Win = 0, draw = 0, totalGames = 0;
 
+        // Check results where user1 played as player1
         for (GameResult gr : gameResults1) {
             User winner = gr.getWinner();
             if (winner == null) {
@@ -92,6 +112,7 @@ public class GameServiceImpl implements GameService {
             totalGames++;
         }
 
+        // Check results where user1 played as player2
         for (GameResult gr : gameResults2) {
             User winner = gr.getWinner();
             if (winner == null) {
@@ -107,6 +128,11 @@ public class GameServiceImpl implements GameService {
         return new relativeRecodeResponse(totalGames, user1Win, user2Win, draw);
     }
 
+    /**
+     * Reward players based on game result.
+     * Win: +100 EXP, +100 coins. Loss: +20 EXP, +20 coins. Draw: +50 each.
+     * but Not Used
+     */
     private void rewardPlayers(User player1, User player2, User winner, boolean draw) {
         if (draw) {
             player1.addExpAndCoins(50, 50);
@@ -129,6 +155,9 @@ public class GameServiceImpl implements GameService {
         userRepository.save(player2);
     }
 
+    /**
+     * Use in-game item by decreasing its count from inventory.
+     */
     private void useItem(User player, Long itemId, int countToUse) {
         if (countToUse <= 0) return;
 

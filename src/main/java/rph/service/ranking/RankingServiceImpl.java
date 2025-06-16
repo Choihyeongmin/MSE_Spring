@@ -13,39 +13,54 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 
+/**
+ * Service for handling ranking-related logic.
+ * Supports ranking updates after games and top-rank retrieval.
+ */
 @Service
 @RequiredArgsConstructor
 public class RankingServiceImpl implements RankingService {
 
-    private final RankingRepository rankingRepository; // Repository for ranking data
+    private final RankingRepository rankingRepository; // Ranking table access
 
+    /**
+     * Get all rankings sorted by total points (descending).
+     */
     @Override
     public List<RankingResponse> getAllRankings() {
-        // Return all rankings sorted by points
         return rankingRepository.findAllByOrderByTotalPointsDesc().stream()
                 .map(RankingResponse::from)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get top N ranked users.
+     * @param count number of top users to return
+     */
     @Override
     public List<RankingResponse> getTopRankings(int count) {
-        // Return top 'count' rankings
         return rankingRepository.findAllByOrderByTotalPointsDesc(PageRequest.of(0, count))
                 .stream()
                 .map(RankingResponse::from)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Update rankings of both players after a game.
+     * Handles win/draw/loss logic and recalculates ranks.
+     */
     @Override
     public void updateRanking(User player1, User player2, User winner, boolean draw) {
-        // Update rankings for both players
         updateSingle(player1, winner, draw);
         updateSingle(player2, winner, draw);
         recalculateAllRanks();
     }
 
+    /**
+     * Update or create a ranking record for a single user.
+     */
     private void updateSingle(User user, User winner, boolean draw) {
-        // Get or create ranking for user
+        // Find existing ranking or create a new one
         Ranking ranking = rankingRepository.findByUser(user)
                 .orElseGet(() -> Ranking.builder()
                         .user(user)
@@ -58,7 +73,7 @@ public class RankingServiceImpl implements RankingService {
                         .lastUpdated(LocalDateTime.now())
                         .build());
 
-        // Update record depending on result
+        // Apply result
         if (draw) {
             ranking.recordDraw();
         } else if (winner != null && winner.getId().equals(user.getId())) {
@@ -71,13 +86,17 @@ public class RankingServiceImpl implements RankingService {
         rankingRepository.save(ranking);
     }
 
+    /**
+     * Recalculate and update all player ranks based on points.
+     * Called after every match to keep leaderboard accurate.
+     */
     private void recalculateAllRanks() {
-        // Reassign ranks based on total points
         List<Ranking> all = rankingRepository.findAllByOrderByTotalPointsDesc();
 
         for (int i = 0; i < all.size(); i++) {
-            all.get(i).setRank_(i + 1);
+            all.get(i).setRank_(i + 1); // 1-based rank
         }
+
         rankingRepository.saveAll(all);
     }
 }

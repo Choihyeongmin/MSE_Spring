@@ -14,40 +14,53 @@ import rph.repository.ItemRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for item-related operations.
+ * Handles item retrieval, creation, updating, and deletion.
+ */
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository; // Repository for item data
+    private final ItemRepository itemRepository; // Repository to access item table
 
+    /**
+     * Get a list of all items.
+     */
     @Override
     public List<ItemResponse> getAllItems() {
-        // Return all items
         return itemRepository.findAll().stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get a single item by its ID.
+     */
     @Override
     public ItemResponse getItemById(Long itemId) {
-        // Find item by ID or throw exception
         return itemRepository.findById(itemId)
                 .map(ItemResponse::from)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
     }
 
+    /**
+     * Get all items filtered by item type.
+     * @param type Item type (e.g., "SKIN", "BOOST")
+     */
     @Override
     public List<ItemResponse> getItemsByType(String type) {
-        // Find items by type
         ItemType itemType = ItemType.valueOf(type.toUpperCase());
         return itemRepository.findByType(itemType).stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Save a new item to the database.
+     */
     @Override
-    public ItemResponse saveItem(ItemRequest request){
-        // Save new item
+    public ItemResponse saveItem(ItemRequest request) {
         Item item = new Item();
         item.setName(request.getName());
         item.setPrice(request.getPrice());
@@ -56,9 +69,12 @@ public class ItemServiceImpl implements ItemService {
         return ItemResponse.from(itemRepository.save(item));
     }
 
+    /**
+     * Update an existing item.
+     * @param id ID of the item to update
+     */
     @Override
     public ItemResponse updateItem(ItemRequest request, Long id) {
-        // Update existing item
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
 
@@ -71,12 +87,13 @@ public class ItemServiceImpl implements ItemService {
         return ItemResponse.from(itemRepository.save(item));
     }
 
+    /**
+     * Delete an item by its ID.
+     */
     @Override
     public void deleteItem(Long id) {
-        // Delete item by ID
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found with id: " + id));
-
         itemRepository.delete(item);
     }
 }
