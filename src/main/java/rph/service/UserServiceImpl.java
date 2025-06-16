@@ -1,5 +1,6 @@
 package rph.service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +10,19 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import rph.dto.*;
 import rph.dto.user.*;
+import rph.entity.Item;
 import rph.entity.RefreshToken;
 import rph.entity.User;
+import rph.entity.UserItem;
 import rph.exception.ErrorCode.CommonErrorCode;
 import rph.exception.ErrorCode.UserErrorCode;
 import rph.exception.RestApiException;
 import rph.exception.UserException;
 import rph.external.GoogleTokenVerifier;
 import rph.jwt.JwtTokenProvider;
+import rph.repository.ItemRepository;
 import rph.repository.RefreshTokenRepository;
+import rph.repository.UserItemRepository;
 import rph.repository.UserRepository;
 import rph.util.PasswordUtil;
 
@@ -28,18 +33,24 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository; // Repository for user
     private final JwtTokenProvider jwtTokenProvider; // JWT token provider
     private final RefreshTokenRepository refreshTokenRepository; // Repository for refresh tokens
+    private final ItemRepository itemRepository; // Repository for item
+    private final UserItemRepository userItemRepository; // Repository for user-item relationship
 
     @Autowired
     public UserServiceImpl(
         GoogleTokenVerifier tokenVerifier,
         UserRepository userRepository,
         JwtTokenProvider jwtTokenProvider,
-        RefreshTokenRepository refreshTokenRepository
+        RefreshTokenRepository refreshTokenRepository,
+        ItemRepository itemRepository,
+        UserItemRepository userItemRepository
     ) {
         this.tokenVerifier = tokenVerifier;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.itemRepository = itemRepository;
+        this.userItemRepository = userItemRepository;
     }
 
     @Override
@@ -67,7 +78,21 @@ public class UserServiceImpl implements UserService {
         user.setRole("ROLE_USER");
 
         userRepository.save(user);
+        userRepository.save(user); // 저장 후 user.getId() 자동 설정됨
 
+        // Give 5 of itemId 1, 2, 3 each to the new user
+        for (long itemId = 1L; itemId <= 3L; itemId++) {
+            Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
+
+            UserItem userItem = new UserItem();
+            userItem.setUser(user);
+            userItem.setItem(item);
+            userItem.setCount(5);
+            userItem.setOwnedAt(LocalDateTime.now());
+
+            userItemRepository.save(userItem);
+        }
         return new SignupResponse(true, "Signup Success!");
     }
 
