@@ -33,19 +33,24 @@ public class GameServiceImpl implements GameService {
     private final UserItemRepository userItemRepository;
     private final RankingService rankingService;
 
+
     /**
      * Save a new game result and update user stats.
+     * If winnerId == -1, it is considered a draw and winner will be null.
      */
     @Override
     public GameResultResponse saveGameResult(GameResultRequest request) {
-        // Find players and winner (null if draw)
+        // Find players
         User player1 = userRepository.findById(request.getPlayer1Id())
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
         User player2 = userRepository.findById(request.getPlayer2Id())
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
-        User winner = request.getWinnerId() == null ? null :
-                userRepository.findById(request.getWinnerId())
-                        .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
+
+        // ✔ winnerId == -1 means draw
+        boolean draw = request.getWinnerId() == -1;
+        User winner = draw ? null :
+            userRepository.findById(request.getWinnerId())
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.USER_NOT_FOUND));
 
         // Use items for both players
         useItem(player1, 1L, request.getPlayer1UseItem1());
@@ -61,7 +66,7 @@ public class GameServiceImpl implements GameService {
         gameResult.setPlayer1(player1);
         gameResult.setPlayer2(player2);
         gameResult.setWinner(winner);
-        gameResult.setDraw(request.isDraw());
+        gameResult.setDraw(draw);
         gameResult.setTileOwnedPlayer1(request.getTileOwnedPlayer1());
         gameResult.setTileOwnedPlayer2(request.getTileOwnedPlayer2());
         gameResult.setScoreDiff(request.getScoreDiff());
@@ -73,11 +78,12 @@ public class GameServiceImpl implements GameService {
         GameResultResponse response = GameResultResponse.from(gameResultRepository.save(gameResult));
 
         // Update rankings and reward players
-        rankingService.updateRanking(player1, player2, winner, request.isDraw());
-        rewardPlayers(player1, player2, winner, request.isDraw());
+        rankingService.updateRanking(player1, player2, winner, draw);
+        rewardPlayers(player1, player2, winner, draw);
 
         return response;
     }
+
 
     /**
      * Return all game results where the player participated.

@@ -27,6 +27,7 @@ public class GameController {
     public ResponseEntity<GameResultResponse> saveGameResult(@Valid @RequestBody GameResultRequest request) {
         // Save game result
         GameResultResponse response = gameService.saveGameResult(request);
+        System.out.println(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
