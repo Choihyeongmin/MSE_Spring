@@ -11,7 +11,7 @@ document.getElementById('create-item-form').addEventListener('submit', async fun
         isStackable: document.getElementById('isStackable').checked
     };
 
-    const response = await fetch('/api/admin/item', {
+    const response = await fetch('/admin/item', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

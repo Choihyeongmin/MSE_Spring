@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GoogleTokenVerifier {
 
-    private static final String CLIENT_ID = "836975504936-7hlnh88vllu5pgugdlermt1iim7s1ikv.apps.googleusercontent.com";
+    private static final String CLIENT_ID = "836975504936-3j31p6e8pkbntg78bbgraiti5i06ceqp.apps.googleusercontent.com";
 
     public GoogleIdToken.Payload verify(String idTokenString) {
         try {

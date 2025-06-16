@@ -17,20 +17,23 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemService itemService;
+    private final ItemService itemService; // Service for item operations
 
     @GetMapping
     public List<ItemResponse> getAllItems() {
+        // Get all items
         return itemService.getAllItems();
     }
 
     @GetMapping("/{itemId}")
     public ItemResponse getItemDetail(@PathVariable Long itemId) {
+        // Get item detail by ID
         return itemService.getItemById(itemId);
     }
 
     @GetMapping("/type/{type}")
     public List<ItemResponse> getItemsByType(@PathVariable String type) {
+        // Get items by type
         return itemService.getItemsByType(type);
     }
 }

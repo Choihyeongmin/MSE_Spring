@@ -22,7 +22,7 @@ public class User {
     private String username;
 
     //Salt
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String salt;
 
     // Login password

@@ -15,14 +15,18 @@ import java.util.List;
 @RequestMapping("/api/user-item")
 @RequiredArgsConstructor
 public class UserItemController {
-    private final UserItemService userItemService;
+
+    private final UserItemService userItemService; // Service for user-item logic
+
     @PostMapping
     public ResponseEntity<UserItemResponse> purchaseItem(@RequestBody UserItemRequest request) {
+        // Purchase an item for a user
         return ResponseEntity.status(HttpStatus.CREATED).body(userItemService.purchaseItem(request));
     }
 
     @GetMapping("/{userId}")
     public List<UserItemResponse> getUserItems(@PathVariable Long userId) {
+        // Get all items owned by a specific user
         return userItemService.getItemsByUserId(userId);
     }
 }

@@ -41,7 +41,7 @@ async function deleteItem(id) {
     const confirmed = confirm('정말 삭제하시겠습니까?');
     if (!confirmed) return;
 
-    const response = await fetch(`/api/admin/item/delete/${id}`, {
+    const response = await fetch(`/admin/item/delete/${id}`, {
         method: 'DELETE',
         headers: {
             'Authorization': 'Bearer ' + accessToken

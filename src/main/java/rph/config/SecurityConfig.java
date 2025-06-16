@@ -4,8 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import rph.jwt.JwtAuthenticationFilter;
 import rph.jwt.JwtTokenProvider;
@@ -28,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeHttpRequests()
-                .antMatchers("/user/login", "/user/signup", "/user/signup/**").permitAll().anyRequest().authenticated()
+                .antMatchers("/user/login", "/user/signup", "/user/signup/**","/admin/*.html","/admin/js/*.js","/admin/css/*.css","/user/google/login","/user/google/login/signup").permitAll().anyRequest().authenticated()
             .and()
             .addFilterBefore(
                 new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),

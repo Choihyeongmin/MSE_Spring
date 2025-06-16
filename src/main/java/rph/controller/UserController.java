@@ -1,4 +1,5 @@
 package rph.controller;
+
 import rph.entity.RefreshToken;
 import rph.entity.User;
 import rph.security.CustomUserDetails;
@@ -18,7 +19,6 @@ import rph.exception.TokenException;
 import rph.exception.UserException;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.http.ResponseEntity;
 
 import rph.dto.*;
 import rph.dto.user.GoogleLoginRequest;
@@ -35,41 +35,42 @@ import rph.service.UserService;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private JwtTokenProvider jwtTokenProvider; // For token generation/validation
 
     @Autowired
-    private UserService userService;
+    private RefreshTokenRepository refreshTokenRepository; // For storing refresh tokens
+
+    @Autowired
+    private UserService userService; // User business logic
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequest request) {
-    userService.signup(request);  
-    return ResponseEntity.ok("Signup Success!");
+        // User signup
+        userService.signup(request);  
+        return ResponseEntity.ok("Signup Success!");
     }
 
-
-    
     @GetMapping("/signup/{username}")
     public ResponseEntity<String> checkUsername(@PathVariable String username) {
-    if (!userService.isUsernameAvailable(username)) {
-        throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
+        // Check if username is available
+        if (!userService.isUsernameAvailable(username)) {
+            throw new UserException(UserErrorCode.USERNAME_DUPLICATED);
+        }
+        return ResponseEntity.ok("The username is available.");
     }
-    return ResponseEntity.ok("The username is available.");
-    }
-
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
-    LoginResponse response = userService.login(request);  
-    return ResponseEntity.ok(response);  // only response succuess
+        // Normal login
+        LoginResponse response = userService.login(request);  
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/refresh")  // Get new AccessToken
+    @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody TokenRefreshRequest request) {
+        // Refresh access token
         String refreshToken = request.getRefreshToken();
 
         if (!jwtTokenProvider.validateToken(refreshToken)) {
@@ -89,54 +90,58 @@ public class UserController {
         return ResponseEntity.ok(new TokenRefreshResponse(newAccessToken));
     }
 
-    public record UserInfoResponse(String username, String nickname, int exp, int level, int coins) {}
+    public record UserInfoResponse(Long userId, String username, String nickname, int exp, int level, int coins) {}
 
-    @GetMapping("/me") //Get my information
+    @GetMapping("/me")
     public ResponseEntity<UserInfoResponse> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-    User user = userDetails.getUser();
-    UserInfoResponse response = new UserInfoResponse(
-        user.getUsername(),
-        user.getNickname(),
-        user.getExp(),
-        user.getLevel(),
-        user.getCoins()
-    );
-    return ResponseEntity.ok(response);
+        // Get info of the logged-in user
+        User user = userDetails.getUser();
+        UserInfoResponse response = new UserInfoResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getNickname(),
+            user.getExp(),
+            user.getLevel(),
+            user.getCoins()
+        );
+        return ResponseEntity.ok(response);
     }
-    
-    @PutMapping("/me")    // User data update, can change Password + Nickname
+
+    @PutMapping("/me")
     public ResponseEntity<String> updateUser(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestBody @Valid UserUpdateRequest request
     ) {
+        // Update nickname/password
         userService.updateUser(userDetails.getUser(), request);
         return ResponseEntity.ok("User info updated.");
     }
 
-    @DeleteMapping("/me") // Delete myself
+    @DeleteMapping("/me")
     public ResponseEntity<String> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-    User user = userDetails.getUser();  // 현재 로그인한 유저 객체
-    userService.deleteUser(user);
-    return ResponseEntity.ok("Your account has been successfully deleted.");
+        // Delete own account
+        User user = userDetails.getUser();
+        userService.deleteUser(user);
+        return ResponseEntity.ok("Your account has been successfully deleted.");
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-    return ResponseEntity.ok("Logout successful (please delete the token on the client side)"); 
-    // The client should delete the token; ensure the JWT is removed so it won't be sent in the Authorization header. 
-   }
+        // Logout instruction (client deletes token)
+        return ResponseEntity.ok("Logout successful (please delete the token on the client side)");
+    }
 
     @PostMapping("/google/login")
     public ResponseEntity<LoginResponse> googleLogin(@RequestBody GoogleLoginRequest request) {
-                System.out.println("googleloginCont");
-
+        // Login via Google ID token
         LoginResponse response = userService.googleLogin(request);
-        return ResponseEntity.ok(response);  // HTTP 200 OK 
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/google/signup")
     public ResponseEntity<LoginResponse> googleLogin(@RequestBody GoogleSignupRequest request) {
+        // Signup via Google ID token
         LoginResponse response = userService.googleSignup(request);
-        return ResponseEntity.ok(response);  // HTTP 200 OK
+        return ResponseEntity.ok(response);
     }
 }

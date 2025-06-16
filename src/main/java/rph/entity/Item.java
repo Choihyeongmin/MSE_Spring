@@ -21,8 +21,8 @@ public class Item {
 
     private int price;
 
-    private boolean isStackable;  // ★ 중복 구매 가능 여부 (true = 가능)
-
+    private boolean isStackable;  // Whether duplicate purchases are possible (true = possible)
+    
     @Enumerated(EnumType.STRING)
     private ItemType type;
 

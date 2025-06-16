@@ -18,10 +18,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
+    private final ItemRepository itemRepository; // Repository for item data
 
     @Override
     public List<ItemResponse> getAllItems() {
+        // Return all items
         return itemRepository.findAll().stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
@@ -29,6 +30,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse getItemById(Long itemId) {
+        // Find item by ID or throw exception
         return itemRepository.findById(itemId)
                 .map(ItemResponse::from)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
@@ -36,6 +38,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemResponse> getItemsByType(String type) {
+        // Find items by type
         ItemType itemType = ItemType.valueOf(type.toUpperCase());
         return itemRepository.findByType(itemType).stream()
                 .map(ItemResponse::from)
@@ -44,6 +47,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse saveItem(ItemRequest request){
+        // Save new item
         Item item = new Item();
         item.setName(request.getName());
         item.setPrice(request.getPrice());
@@ -54,23 +58,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse updateItem(ItemRequest request, Long id) {
-        // 기존 item 조회
+        // Update existing item
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.ITEM_NOT_FOUND));
 
-        // 필드 업데이트
         item.setName(request.getName());
         item.setPrice(request.getPrice());
         item.setDescription(request.getDescription());
         item.setType(ItemType.valueOf(request.getType().toUpperCase()));
-        item.setStackable(request.isStackable());  // isStackable 필드도 잊지 말기!
+        item.setStackable(request.isStackable());
 
-        // 저장 후 반환
         return ItemResponse.from(itemRepository.save(item));
     }
 
     @Override
     public void deleteItem(Long id) {
+        // Delete item by ID
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found with id: " + id));
 

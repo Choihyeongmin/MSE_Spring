@@ -13,8 +13,8 @@ public class GameResultResponse {
     private Long id;
     private Long player1Id;
     private Long player2Id;
-    private Long winnerId;         // 무승부일 경우 null 허용
-    private boolean draw;          // true이면 무승부
+    private Long winnerId;         // if draw, null
+    private boolean draw;          // true is draw
     private int tileOwnedPlayer1;
     private int tileOwnedPlayer2;
     private int scoreDiff;

@@ -18,30 +18,36 @@ import rph.service.item.ItemService;
 public class AdminController {
 
     @Autowired
-    private ItemService itemService;
-     @Autowired
-    private UserService userService;
+    private ItemService itemService; // Service for item operations
 
-    @PostMapping ("/item")
-    public ResponseEntity<ItemResponse> saveItem(@Valid@RequestBody ItemRequest item){
-        ItemResponse response  = itemService.saveItem(item);  // ItemServie
+    @Autowired
+    private UserService userService; // Service for user operations
+
+    @PostMapping("/item")
+    public ResponseEntity<ItemResponse> saveItem(@Valid @RequestBody ItemRequest item) {
+        // Create new item
+        ItemResponse response = itemService.saveItem(item);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/user/{username}")
     public ResponseEntity<String> deleteUserByAdmin(@PathVariable String username) {
-    userService.deleteUserByAdmin(username);   // UserService
-    return ResponseEntity.ok("User '" + username + "' has been deleted by admin.");
+        // Admin deletes a user by username
+        userService.deleteUserByAdmin(username);   
+        return ResponseEntity.ok("User '" + username + "' has been deleted by admin.");
     }
+
     @PutMapping("/item/update/{id}")
-    public ResponseEntity<ItemResponse> putMethodName(@PathVariable Long id, @Valid@RequestBody ItemRequest item) {
-        ItemResponse response  = itemService.updateItem(item, id);
+    public ResponseEntity<ItemResponse> putMethodName(@PathVariable Long id, @Valid @RequestBody ItemRequest item) {
+        // Update existing item
+        ItemResponse response = itemService.updateItem(item, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/item/delete/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
-        itemService.deleteItem(id);  // Service 호출
+        // Delete item by ID
+        itemService.deleteItem(id);  
         return ResponseEntity.noContent().build();
     }
 }
