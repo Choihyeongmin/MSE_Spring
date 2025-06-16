@@ -34,7 +34,7 @@ document.getElementById('update-item-form').addEventListener('submit', async fun
         isStackable: document.getElementById('isStackable').checked
     };
 
-    const response = await fetch(`/api/admin/item/update/${itemId}`, {
+    const response = await fetch(`/admin/item/update/${itemId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
